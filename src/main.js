@@ -1,4 +1,67 @@
 import { createApp } from 'vue'
-import App from './App.vue'
+import App from './App.vue';
+import { createStore } from 'vuex'
 
-createApp(App).mount('#app')
+const store = createStore({
+    state () {
+        return {
+            todos: [
+                {
+                    title: "Todo num 1",
+                    completed: false,
+                },
+                {
+                    title: "Todo num 2",
+                    completed: false,
+                }
+            ]
+        }
+    },
+    getters: {
+        completedTodos(state){
+            return state.todos.filter(todo => {
+                return todo.completed === true;
+            }).length;
+        },
+        pendingTodos(state){
+            return state.todos.filter(todo => {
+                return todo.completed === false;
+            }).length;
+        },
+    },
+    mutations: {
+        NEW_TODO(state, todoItem) {
+            state.todos.push({
+                title: todoItem,
+                completed: false,
+            })
+        },
+
+        DELETE_TODO(state, todoItem) {
+            let index = state.todos.indexOf(todoItem);
+            state.todos.splice(index,1);
+        },
+
+        TOGGLE_TODO_STATUS(state, todoItem){
+            todoItem.completed = !todoItem.completed;
+        }
+    },
+    actions: {
+        addNewToDo({commit}, todoItem){
+            commit("NEW_TODO", todoItem);
+        },
+
+        deleteTodo({commit}, todoItem){
+            commit('DELETE_TODO', todoItem)
+        },
+        toggleTodoStatus({commit}, todoItem){
+            commit('TOGGLE_TODO_STATUS', todoItem);
+        }
+    }
+})
+
+const app = createApp(App);
+
+app.use(store);
+
+app.mount("#app");
